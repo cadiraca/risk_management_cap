@@ -11,14 +11,20 @@
   "private": true,
   "dependencies": {
     "@sap-cloud-sdk/http-client": "^2.5.0",
-    "@sap/cds": "^6",
-    "express": "^4"
+    "@sap/cds": "^6.6.0",
+    "@sap/xsenv": "^3.4.0",
+    "@sap/xssec": "^3.2.17",
+    "express": "^4",
+    "hdb": "^0.19.0",
+    "passport": "^0.6.0"
   },
   "devDependencies": {
+    "@sap/ux-specification": "^1.102.17",
     "sqlite3": "^5.0.4"
   },
   "scripts": {
-    "start": "cds run"
+    "start": "cds run",
+    "watch-risk": "cds watch --open risk/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
@@ -49,8 +55,46 @@
     "requires": {
       "API_BUSINESS_PARTNER": {
         "kind": "odata-v2",
-        "model": "srv\\external\\API_BUSINESS_PARTNER"
+        "model": "srv\\external\\API_BUSINESS_PARTNER",
+        "[development]": {
+          "credentials": {
+            "url": "https://sandbox.api.sap.com/s4hanacloud/sap/opu/odata/sap/API_BUSINESS_PARTNER/"
+          }
+        },
+        "[production]": {
+          "credentials": {
+            "destination": "API_BUSINESS_PARTNER"
+          }
+        }
+      },
+      "db": {
+        "kind": "hana-cloud",
+        "credentials": {
+          "database_id": "4dcf98bb-a2fa-477d-9b78-b91383e2d4ef",
+          "host": "4dcf98bb-a2fa-477d-9b78-b91383e2d4ef.hana.trial-us10.hanacloud.ondemand.com",
+          "port": "443",
+          "driver": "com.sap.db.jdbc.Driver",
+          "url": "jdbc:sap://4dcf98bb-a2fa-477d-9b78-b91383e2d4ef.hana.trial-us10.hanacloud.ondemand.com:443?encrypt=true&validateCertificate=true&currentschema=8E1F68ADFB7F4814A8A67E6B0C0A4ECB",
+          "schema": "8E1F68ADFB7F4814A8A67E6B0C0A4ECB",
+          "hdi_user": "8E1F68ADFB7F4814A8A67E6B0C0A4ECB_2DEYA8Y24Z9RLXA3WJQMI33E3_DT",
+          "hdi_password": "Pi64pD8N9d7.em.qXZND_ixvf59RvGq3ReYUwop4fj_7R7l.qQcYbuLbRVKIb-8Ew3c9G2XT5eZRJSdrn3ohKBGGnTQWPbE25NljEi3nBLwqAxIP6X_Yc5MtLSt4UzU5",
+          "user": "8E1F68ADFB7F4814A8A67E6B0C0A4ECB_2DEYA8Y24Z9RLXA3WJQMI33E3_RT",
+          "password": "Yf8vm1HMMj2OboInbZKSK4BRGIpm5lKXPvxFYbPx9mUt2muHcDcewdbdyj2XsZs5YDiCpfZkPr.P8Lr.exwmMujJWQMB_dNDwjtHtllXldoN0CRTeh-fKv6.vXBX90Yj",
+          "certificate": "-----BEGIN CERTIFICATE-----\nMIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh\nMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\nd3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\nQTAeFw0wNjExMTAwMDAwMDBaFw0zMTExMTAwMDAwMDBaMGExCzAJBgNVBAYTAlVT\nMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j\nb20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IENBMIIBIjANBgkqhkiG\n9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4jvhEXLeqKTTo1eqUKKPC3eQyaKl7hLOllsB\nCSDMAZOnTjC3U/dDxGkAV53ijSLdhwZAAIEJzs4bg7/fzTtxRuLWZscFs3YnFo97\nnh6Vfe63SKMI2tavegw5BmV/Sl0fvBf4q77uKNd0f3p4mVmFaG5cIzJLv07A6Fpt\n43C/dxC//AH2hdmoRBBYMql1GNXRor5H4idq9Joz+EkIYIvUX7Q6hL+hqkpMfT7P\nT19sdl6gSzeRntwi5m3OFBqOasv+zbMUZBfHWymeMr/y7vrTC0LUq7dBMtoM1O/4\ngdW7jVg/tRvoSSiicNoxBN33shbyTApOB6jtSj1etX+jkMOvJwIDAQABo2MwYTAO\nBgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUA95QNVbR\nTLtm8KPiGxvDl7I90VUwHwYDVR0jBBgwFoAUA95QNVbRTLtm8KPiGxvDl7I90VUw\nDQYJKoZIhvcNAQEFBQADggEBAMucN6pIExIK+t1EnE9SsPTfrgT1eXkIoyQY/Esr\nhMAtudXH/vTBH1jLuG2cenTnmCmrEbXjcKChzUyImZOMkXDiqw8cvpOp/2PV5Adg\n06O/nVsJ8dWO41P0jmP6P6fbtGbfYmbW0W5BjfIttep3Sp+dWOIrWcBAI+0tKIJF\nPnlUkiaY4IBIqDfv8NZ5YBberOgOzW6sRBc4L0na4UU+Krk2U886UAb3LujEV0ls\nYSEY1QSteDwsOoBrp+uvFRTp2InBuThs4pFsiv9kuXclVzDAGySj4dzp30d8tbQk\nCAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n-----END CERTIFICATE-----"
+        }
+      },
+      "xsuaa": {
+        "kind": "xsuaa"
+      },
+      "hana": {
+        "deploy-format": "hdbtable"
+      },
+      "auth": {
+        "kind": "xsuaa"
       }
     }
-  }
+  },
+  "sapux": [
+    "app/risk"
+  ]
 }
